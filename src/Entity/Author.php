@@ -7,7 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[UniqueEntity(['name'])]
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
 class Author
 {
@@ -16,14 +19,19 @@ class Author
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Length(min: 10)]
+    #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $dateOfBirth = null;
+    #[Assert\NotBlank()]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    private ?\DateTimeImmutable $dateOfBirth = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $dateOfDeath = null;
+    #[Assert\GreaterThan(propertyPath: 'dateOfBirth')]
+    #[Assert\NotBlank()]#[Assert\GreaterThan(propertyPath: 'dateOfBirth')]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $dateOfDeath = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $nationality = null;

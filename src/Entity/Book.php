@@ -8,7 +8,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
+#[UniqueEntity(['title', 'isbn'])]
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 class Book
 {
@@ -18,20 +21,29 @@ class Book
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank()]
+    private ?string $title = null;
+
+    #[ORM\Column(length: 255)]
     private ?BookStatus $status = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Isbn(type: 'isbn13')]
+    #[Assert\NotBlank()]
     private ?string $isbn = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Url()]
     private ?string $cover = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $editedAt = null;
 
+    #[Assert\Length(min: 20)]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $plot = null;
 
+    #[Assert\Type(type: 'integer')]
     #[ORM\Column]
     private ?int $pageNumber = null;
 
@@ -50,9 +62,6 @@ class Book
      */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'book', orphanRemoval: true)]
     private Collection $comments;
-
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
 
     public function __construct()
     {
