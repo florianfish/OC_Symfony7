@@ -8,10 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[UniqueEntity(['title', 'isbn'])]
 #[ORM\Entity(repositoryClass: BookRepository::class)]
 class Book
 {
@@ -20,53 +18,54 @@ class Book
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
     #[Assert\NotBlank()]
+    #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
-    private ?BookStatus $status = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Isbn(type: 'isbn13')]
     #[Assert\NotBlank()]
+    #[ORM\Column(length: 255)]
     private ?string $isbn = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank()]
     #[Assert\Url()]
+    #[ORM\Column(length: 255)]
     private ?string $cover = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $editedAt = null;
+    #[Assert\NotBlank()]
+    #[ORM\Column]
+    private ?\DateTimeImmutable $editedAt = null;
 
     #[Assert\Length(min: 20)]
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank()]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $plot = null;
 
     #[Assert\Type(type: 'integer')]
     #[ORM\Column]
     private ?int $pageNumber = null;
 
+    #[ORM\Column(length: 255)]
+    private ?BookStatus $status = null;
+
     #[ORM\ManyToOne(inversedBy: 'books')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Editor $editor = null;
 
-    /**
-     * @var Collection<int, Author>
-     */
-    #[ORM\ManyToMany(targetEntity: Author::class, inversedBy: 'books')]
-    private Collection $authors;
-
-    /**
-     * @var Collection<int, Comment>
-     */
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'book', orphanRemoval: true)]
     private Collection $comments;
 
+    #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books', cascade: ['persist'])]
+    private Collection $authors;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
+
     public function __construct()
     {
-        $this->authors = new ArrayCollection();
         $this->comments = new ArrayCollection();
+        $this->authors = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -74,14 +73,14 @@ class Book
         return $this->id;
     }
 
-    public function getStatus(): ?BookStatus
+    public function getTitle(): ?string
     {
-        return $this->status;
+        return $this->title;
     }
 
-    public function setStatus(BookStatus $status): static
+    public function setTitle(string $title): static
     {
-        $this->status = $status;
+        $this->title = $title;
 
         return $this;
     }
@@ -91,7 +90,7 @@ class Book
         return $this->isbn;
     }
 
-    public function setIsbn(?string $isbn): static
+    public function setIsbn(string $isbn): static
     {
         $this->isbn = $isbn;
 
@@ -103,19 +102,19 @@ class Book
         return $this->cover;
     }
 
-    public function setCover(?string $cover): static
+    public function setCover(string $cover): static
     {
         $this->cover = $cover;
 
         return $this;
     }
 
-    public function getEditedAt(): ?\DateTimeInterface
+    public function getEditedAt(): ?\DateTimeImmutable
     {
         return $this->editedAt;
     }
 
-    public function setEditedAt(\DateTimeInterface $editedAt): static
+    public function setEditedAt(\DateTimeImmutable $editedAt): static
     {
         $this->editedAt = $editedAt;
 
@@ -127,7 +126,7 @@ class Book
         return $this->plot;
     }
 
-    public function setPlot(?string $plot): static
+    public function setPlot(string $plot): static
     {
         $this->plot = $plot;
 
@@ -146,6 +145,18 @@ class Book
         return $this;
     }
 
+    public function getStatus(): ?BookStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(BookStatus $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
     public function getEditor(): ?Editor
     {
         return $this->editor;
@@ -154,30 +165,6 @@ class Book
     public function setEditor(?Editor $editor): static
     {
         $this->editor = $editor;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Author>
-     */
-    public function getAuthors(): Collection
-    {
-        return $this->authors;
-    }
-
-    public function addAuthor(Author $author): static
-    {
-        if (!$this->authors->contains($author)) {
-            $this->authors->add($author);
-        }
-
-        return $this;
-    }
-
-    public function removeAuthor(Author $author): static
-    {
-        $this->authors->removeElement($author);
 
         return $this;
     }
@@ -212,14 +199,41 @@ class Book
         return $this;
     }
 
-    public function getTitle(): ?string
+    /**
+     * @return Collection<int, Author>
+     */
+    public function getAuthors(): Collection
     {
-        return $this->title;
+        return $this->authors;
     }
 
-    public function setTitle(string $title): static
+    public function addAuthor(Author $author): static
     {
-        $this->title = $title;
+        if (!$this->authors->contains($author)) {
+            $this->authors->add($author);
+            $author->addBook($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuthor(Author $author): static
+    {
+        if ($this->authors->removeElement($author)) {
+            $author->removeBook($this);
+        }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

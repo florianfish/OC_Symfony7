@@ -1,35 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Administration - Editeur{% endblock %}
-
+{% block title %}Éditeur{% endblock %}
 
 {% block body %}
-    <div class="bg-light">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="example-wrapper">
-                        <h1>Editeur : </h1>
-                        {% if editor is not null %}
-                            <div class="card mb-1 m-auto">
-                                <div class="card-body">
-                                    <div class="card-title d-flex justify-content-between">
-                                        <h4 class="mb-1">{{ editor.name }}</h4>
-                                        <small class="text-muted">Identifiant : {{ editor.id }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        {% else %}
-                            <div>Editeur non trouvé</div>
-                        {% endif %}
-                    </div>
+<section class="container px-4">
+    <h1>Éditeur : </h1>
 
-                    <div class="example-wrapper pt-2 pb-2 text-center">
-                        <a href="{{ path('app_admin_editor_index') }}" class="btn btn-primary">Retour</a>
-                        <a href="{{ path('app_admin_editor_edit', {id: editor.id}) }}" class="btn btn-warning">Éditer</a>
-                    </div>
+    {% if editor is not null %}
+        <div class="card mb-1 m-auto">
+            <div class="card-body">
+                <div class="card-title d-flex justify-content-between">
+                    <h4 class="mb-1">{{ editor.name }}</h4>
+                    <small class="text-muted">Identifiant : {{ editor.id }}</small>
                 </div>
             </div>
         </div>
-    </div>
+    {% else %}
+        <div>Éditeur non trouvé</div>
+    {% endif %}
+    <a href="{{ path('app_admin_editor_index') }}" class="btn btn-primary">Retour</a>
+    <a href="{{ path('app_admin_editor_edit', {id: editor.id}) }}" class="btn btn-warning">Éditer</a>
+</section>
 {% endblock %}

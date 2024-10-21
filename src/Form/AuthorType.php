@@ -16,30 +16,25 @@ class AuthorType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', TextType::class, [
-                'label' => 'Nom'
-            ])
+            ->add('name', TextType::class)
             ->add('dateOfBirth', DateType::class, [
                 'input' => 'datetime_immutable',
                 'widget' => 'single_text',
-                'label' => 'Date de naissance'
             ])
             ->add('dateOfDeath', DateType::class, [
                 'input' => 'datetime_immutable',
                 'widget' => 'single_text',
                 'required' => false,
-                'label' => 'Date de décès'
             ])
             ->add('nationality', TextType::class, [
                 'required' => false,
-                'label' => 'Nationalité'
             ])
             ->add('books', EntityType::class, [
                 'class' => Book::class,
-                'choice_label' => 'id',
+                'choice_label' => 'title',
                 'multiple' => true,
                 'required' => false,
-                'label' => 'Liste des livres'
+                'by_reference' => false,
             ])
         ;
     }

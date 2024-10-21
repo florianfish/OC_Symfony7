@@ -9,6 +9,11 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Author>
+ *
+ * @method Author|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Author|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Author[]    findAll()
+ * @method Author[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class AuthorRepository extends ServiceEntityRepository
 {
@@ -17,7 +22,7 @@ class AuthorRepository extends ServiceEntityRepository
         parent::__construct($registry, Author::class);
     }
 
-    public function findByDateOfBirth(array $dates = [], $returnQb = false): array|QueryBuilder
+    public function findByDateOfBirth(array $dates = []): QueryBuilder
     {
         $qb = $this->createQueryBuilder('a');
 
@@ -31,12 +36,31 @@ class AuthorRepository extends ServiceEntityRepository
                 ->setParameter('end', new \DateTimeImmutable($dates['end']));
         }
 
-        $qb = $qb->orderBy('a.dateOfBirth', 'DESC');
-        if ($returnQb) {
-            return $qb;
-        }
-        return $qb
-            ->getQuery()
-            ->getResult();
+        return $qb;
     }
+
+    //    /**
+    //     * @return Author[] Returns an array of Author objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('a')
+    //            ->andWhere('a.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('a.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
+
+    //    public function findOneBySomeField($value): ?Author
+    //    {
+    //        return $this->createQueryBuilder('a')
+    //            ->andWhere('a.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }
