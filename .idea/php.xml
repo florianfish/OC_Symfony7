@@ -169,6 +169,9 @@
       <path value="$PROJECT_DIR$/vendor/api-platform/documentation" />
       <path value="$PROJECT_DIR$/vendor/api-platform/json-schema" />
       <path value="$PROJECT_DIR$/vendor/api-platform/jsonld" />
+      <path value="$PROJECT_DIR$/vendor/lcobucci/jwt" />
+      <path value="$PROJECT_DIR$/vendor/lcobucci/clock" />
+      <path value="$PROJECT_DIR$/vendor/lexik/jwt-authentication-bundle" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />

@@ -1,0 +1,22 @@
+meta {
+  name: Get books
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{domain}}/api/books
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "roy.stephanie@pasquier.net",
+    "password": "roy.stephanie@pasquier.net"
+  }
+}

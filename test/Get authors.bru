@@ -1,0 +1,22 @@
+meta {
+  name: Get authors
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{domain}}/api/authors
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "email": "roy.stephanie@pasquier.net",
+    "password": "roy.stephanie@pasquier.net"
+  }
+}
